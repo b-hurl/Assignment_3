@@ -1,0 +1,52 @@
+// Assignment3.cpp : Defines the entry point for the console application.
+// https://stackoverflow.com/questions/5318989/reverb-algorithm
+//https://www.daniweb.com/programming/software-development/threads/128352/read-a-raw-pcm-file-and-then-play-it-with-sound-in-c-or-c
+
+#include "stdafx.h"
+
+
+#include <iostream>
+#include <fstream>
+#include <ostream>
+#include <iomanip>
+#include <cmath>
+#include <algorithm>
+using namespace std;
+void main()
+{
+	fstream f_in;
+	ofstream f_output;
+	short speech, value[10000];
+
+	f_in.open("myfile.pcm", std::ios::in | std::ios::binary);
+
+	int i = 0;
+	while (i < 10000) {
+		f_in.read((char *)&speech, 2);
+		value[i] = speech;
+		cout << speech << std::endl;
+		i++;
+	}
+	//Create distortion sound effect
+	//Set the delay for half a second
+	int delayMilliseconds = 500;
+	//we make the assumption that the sample rate is 4400 HZ
+	int delaySamples = (int)((float)delayMilliseconds * 44.1f);
+	float decay = 0.5f;
+	//Go through the values and modify the information from myfile
+	for (int j = 0; j < 10000 - delaySamples; j++)
+	{
+		// WARNING: overflow potential
+		value[j + delaySamples] += (short)((float)value[j] * decay);
+	}
+	f_output.open("newfile.pcm", std::ios::out | std::ios::binary);
+	i = 0;
+	while (i < 10000) {
+		f_output << value[i] << endl;
+	}
+	f_output.close;
+	f_in.close;
+	}
+
+
+
